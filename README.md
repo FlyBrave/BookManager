@@ -25,8 +25,8 @@ Spring中重要的AOP组件，用来面向切面编程，多用在日志打印�
 * templates（文件夹） 存放html文件以及模板文件
 * application.properties（文件） Spring Boot的配置文件
 * log4j.properties（文件） log4j的配置文件
-* mybatis-config.xml MyBatis的配置文件，一般不做改动
-* BookManagerApplication.java Spring Boot的入口，你搭好项目后可以运行一下试试看
+* mybatis-config.xml（文件） MyBatis的配置文件，一般不做改动
+* BookManagerApplication.java（文件） Spring Boot的入口，你搭好项目后可以运行一下试试看
 
 ### 下面是我们自己创建的文件夹：
 * biz 用来存放比较复杂的逻辑
@@ -37,6 +37,8 @@ Spring中重要的AOP组件，用来面向切面编程，多用在日志打印�
 * model 各种数据模型，对数据的描述
 * service 一般用作对dao层的封装，建议稍复杂的逻辑全部放到biz包，而不是service
 * utils 工具包，一般都是静态方法。
+
+这里的核心主要是controllers、service、dao、model这四个包。
 
 ### 在model里面还有几个包：
 * constants 放项目中的常量类（类里面全部是常量）
