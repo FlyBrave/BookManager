@@ -202,8 +202,8 @@ spring.freemarker.suffix=.html
 经过上面的开发，相信你也掌握了Spring Boot以及SSM框架的基本用法。那么接下来我们要
 完善用户登录和权限认证工能。
 
-同样的，我们为用户和用户的凭证设计数据模型，在` User.java ` 和 ` Ticket.java `文
-件中。例如在` Ticket.java `文件中：
+同样的，我们为用户和用户的凭证设计数据模型，根据模型创建相应的数据库表。并相应编写` User.java ` 和 ` Ticket.java `。
+例如在` Ticket.java `文件中：
 
 ``` java
     /**
