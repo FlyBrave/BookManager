@@ -1,8 +1,9 @@
 package com.nowcoder.project.controllers;
 
-
 import com.nowcoder.project.model.Book;
+import com.nowcoder.project.model.User;
 import com.nowcoder.project.service.BookService;
+import com.nowcoder.project.service.HostHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,16 +21,26 @@ public class BookController {
   @Autowired
   private BookService bookService;
 
+  @Autowired
+  private HostHolder hostHolder;
+
   @RequestMapping(path = {"/index"}, method = {RequestMethod.GET})
   public String bookList(Model model) {
+
+    User host = hostHolder.getUser();
+    if (host != null) {
+      model.addAttribute("host", host);
+    }
     loadAllBooksView(model);
     return "book/books";
+
   }
 
   @RequestMapping(path = {"/books/add"}, method = {RequestMethod.GET})
   public String addBook() {
     return "book/addbook";
   }
+
 
   @RequestMapping(path = {"/books/add/do"}, method = {RequestMethod.POST})
   public String doAddBook(
