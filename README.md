@@ -352,3 +352,128 @@ null情况的String操作，不会引发String引起的NullPointerException。
 下一步：
 
     git checkout step-5-project-login-controller
+    
+# 第五步：完成Interceptor以及Controller
+
+    git checkout step-5-project-login-controller
+    
+终于到了最后一步。
+## 先看LoginController
+与` LoginBiz.java `的逻辑一样，我们主要看` LoginController.java `中的doLogin方法。
+这个方法里面完成了真正的登录逻辑：
+
+``` java 
+    @RequestMapping(path = {"/users/login/do"}, method = {RequestMethod.POST})
+        public String doLogin(
+            Model model,
+            HttpServletResponse response,
+            @RequestParam("email") String email,
+            @RequestParam("password") String password
+        ) {
+        try {
+            String t = loginBiz.login(email, password);
+            CookieUtils.writeCookie("t", t, response);
+            return "redirect:/index";
+        } catch (Exception e) {
+            model.addAttribute("error", e.getMessage());
+            return "404";
+        }
+    }
+``` 
+我们直接调用了` loginBiz.login(email, password); `方法，这个方法里面抛出了我们自
+定义的异常，记得用try catch包起来。这里对于异常的处理是返回一个自定义的404页面，
+并在页面上渲染上出错的原因。
+
+` CookieUtils.writeCookie("t", t, response); `这句将` loginBiz.login(email, password); `
+方法返回的t票字符串放入Cookie中，当你成功后，可以在你的浏览器中查看是否成功写入了Cookie。
+最后` return "redirect:/index"; `这里实际上是一个跳转，跳转到了/index对应的Action（一般把带有web入口的方法称为Action）。
+
+## 这个方法还是挺简单的对吧？我们再看看BookController发生了什么变化。
+
+``` java
+    @RequestMapping(path = {"/index"}, method = {RequestMethod.GET})
+    public String bookList(Model model) {
+        User host = hostHolder.getUser();
+        if (host != null) {
+          model.addAttribute("host", host);
+        }
+        loadAllBooksView(model);
+        return "book/books";
+    }
+```
+首先我们持有了一个HostHolder的引用，同样这个引用由Spring实例化并为我们注入。我们
+试图从hostHolder中取出当前线程对应的User，可以想象得到，如果用户没有登录的情况下，
+host是没有的，也就是null。
+
+## 对应的books.html也发生了一些变化：
+
+``` html
+    <#if host??>
+		<table cellpadding="10">
+			<tr>
+			<td>${host.name}</td>
+				<td><a href="/users/logout/do">退出登录</a></td>
+			</tr>
+		</table>
+    <#else>
+    <h5>未登录！<a href="/users/login">登陆/</a><a href="/users/register">注册</a></h5>
+    </#if>
+```
+这一段可以看到，如果没有host的model的话，就显示“未登录”，并提供“登录/注册”按钮，
+如果有host的话，显示当前用户名和退出登录按钮。
+
+## 思考一下，我们再登录的时候会写入host信息到HostHoder里面去，但是我们在操作图书而不是做登录操作的时候，怎么将host信息写到HostHoder中呢？
+这时，我们希望在做所有对书本的操作之前，都进行一次t票的认证操作，即通过t票找到t票对应的用户，并将用户信息放入HostHoder中。
+如果在所有方法前都加上这么一段，总会显得不那么优雅，因为我们要尽力避免去做重复的事情，这样也方便维护。
+
+这时，我们的AOP登场了。使用AOP来进行权限认证工作再适合不过了。
+
+## HostInfoInterceptor.java
+这个拦截器总是返回true，所以无论怎么样这个拦截器都能通过。这个拦截器试图通过请求中的Cookie来寻找t票，
+一旦寻找到t票并成功的从数据库中找到了对应的用户，就直接放入ConcurrentUtils中（别忘了ConcurrentUtils 和 HostHolder是一回事）。
+这里解释了，为什么你在登录一次之后，再进行其他的操作时，服务器都能识别操作用户是谁，甚至你关闭浏览器之后再次打开也不用重新登录，
+因为服务器跟你浏览器发送的请求中附带的Cookie对你的身份自动进行了认证。
+
+如果没有找到host信息，也没关系，直接放行就行。
+
+## LoginInterceptor.java
+这里是真正的权限认证：
+
+``` java
+@Override
+      public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+          throws Exception {
+    
+        //没有t票，去登陆
+        String t = CookieUtils.getCookie("t",request);
+        if(StringUtils.isEmpty(t)){
+            response.sendRedirect("/users/login");
+            return false;
+        }
+    
+        //无效t票，去登陆
+        Ticket ticket = ticketService.getTicket(t);
+        if(ticket == null){
+            response.sendRedirect("/users/login");
+            return false;
+        }
+    
+        //过期t票，去登陆
+        if(ticket.getExpiredAt().before(new Date())){
+            response.sendRedirect("/users/login");
+            return false;
+        }
+    
+        return true;
+  }
+```
+
+对于以上几种情况，都会直接跳转到登录页面。
+
+## BookWebConfiguration.java 真正让拦截器生效的地方
+注意，里面注册的顺序非常重要，同学你可以想一想如果顺序不同会怎么样。
+
+` addPathPatterns ` 设置了对于什么url的请求拦截器会生效。
+
+-----
+## 大功告成！大家一定一定要自己亲自敲出自己代码。
