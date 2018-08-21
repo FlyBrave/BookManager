@@ -169,8 +169,8 @@ Spring中重要的AOP组件，用来面向切面编程，多用在日志打印�
 ```
 这是一个简单的controller方法，极其优雅的为我们展现了MVC框架：
 * 第一行告诉了web什么样的url才能进入这个方法，
-* 方法的主体部分：loadAllBooksView(model); 告诉web如何处理和组装Model
-* 最后return "book/books";告诉web返回什么样的View
+* 方法的主体部分：` loadAllBooksView(model); ` 告诉web如何处理和组装Model
+* 最后` return "book/books"; `告诉web返回什么样的View
 * 而这整段代码整体就是一个控制器Controller，它控制了怎么进入、怎么处理、怎么返回的所有操作。
 
 根据这个简单的例子，你一定可以对MVC框架有一个深刻的体会。
