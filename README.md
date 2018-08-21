@@ -78,7 +78,11 @@ Spring中重要的AOP组件，用来面向切面编程，多用在日志打印�
 ``` java
     /*- 墨西哥郊外一座靠近海岸的美丽城市 -*/
     private String countryside;
+    
+    //而不是
+    private String aBeautifulCountrysideOfMexico......
 ```
+这应该很容易理解对吧。
 ### dao包中的BookDAO.java就是用来跟数据库打交道的
 
 ``` java
