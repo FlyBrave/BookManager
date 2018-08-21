@@ -186,7 +186,7 @@ spring.freemarker.suffix=.html
 
 如果你的代码都敲完啦，那么打开` localhost:8080/index `看看吧！
 
-** tomcat已经被嵌入到内部了，大家不用操心怎么搭建tomcat。 **
+**tomcat已经被嵌入到内部了，大家不用操心怎么搭建tomcat。**
 
 ## 好了！你一定要自己敲代码！不然你的收获将非常有限！
 
