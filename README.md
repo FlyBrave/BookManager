@@ -184,6 +184,10 @@ spring.freemarker.suffix=.html
 这一句呢，作用就是让我们能保持习惯，将templates文件夹下的模板文件以.html结尾。
 关于application.properties的设置还有很多，同样建议你去查看官方文档。
 
+如果你的代码都敲完啦，那么打开` localhost:8080/index `看看吧！
+
+tomcat已经被嵌入到内部了，大家不用操心怎么搭建tomcat。
+
 ## 好了！你一定要自己敲代码！不然你的收获将非常有限！
 
 下一步：
