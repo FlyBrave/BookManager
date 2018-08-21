@@ -154,7 +154,9 @@ Spring中重要的AOP组件，用来面向切面编程，多用在日志打印�
 根据Name也好还是根据id也好在上层来看并没有区别，都是给我去取一本书来，我不用管你
 是根据书的什么属性去取。在面向对象的编程中，慢慢养成面向对象思维才是最重要的，不然
 就是用着java写着C。
-### 真正的大佬了Controller
+
+#### 这里的service只做了最基本的包装，相信你能写的更漂亮！
+### 真正的大佬Controller
 有的同学有一个误区，认为Controller就是网页的入口，这是错误的。我们看看BookController.java
 中的第一个方法：
 
@@ -166,8 +168,8 @@ Spring中重要的AOP组件，用来面向切面编程，多用在日志打印�
     }
 ```
 这是一个简单的controller方法，极其优雅的为我们展现了MVC框架：
-* 第一行告诉了web什么样的url才能进入这个函数，
-* 函数的主体部分：loadAllBooksView(model);告诉web如何处理Model流
+* 第一行告诉了web什么样的url才能进入这个方法，
+* 方法的主体部分：loadAllBooksView(model); 告诉web如何处理和组装Model
 * 最后return "book/books";告诉web返回什么样的View
 * 而这整段代码整体就是一个控制器Controller，它控制了怎么进入、怎么处理、怎么返回的所有操作。
 
