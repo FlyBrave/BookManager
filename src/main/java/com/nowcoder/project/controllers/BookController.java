@@ -22,10 +22,8 @@ public class BookController {
 
   @RequestMapping(path = {"/index"}, method = {RequestMethod.GET})
   public String bookList(Model model) {
-
     loadAllBooksView(model);
     return "book/books";
-
   }
 
   @RequestMapping(path = {"/books/add"}, method = {RequestMethod.GET})
