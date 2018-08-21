@@ -254,3 +254,101 @@ java的JDK源码或者Spring源码的注释习惯。
 下一步
 
     git checkout step-4-project-login-biz
+
+# 第四步：完成Login的主要逻辑-LoginBiz.java
+
+    git checkout step-4-project-login-biz
+    
+经过上面的铺垫，我们已经写好了User和Login的底层代码。现在我们需要组织我们已经写好
+的服务，将其组织为一个登陆逻辑。
+
+## 我们增加了很多Utils类
+先从简单的开始：
+### MD5.java
+这个类就是用来加密的。服务器不保存用户的明文密码是一项基本常识，所以我们用MD5来加密。
+这里也不要专注于MD5的具体实现方法，这不是我们的主要任务，但建议你至少要知道MD5常用
+在什么地方，并知道这个加密是不可逆的就可以了。
+### UuidUtils.java
+注意到Cookie都是一串无意义的码串，我们用JDK自带的UUID生成器可以非常方便的生成这样
+一串随机的字符串。
+### ConcurrentUtils.java
+用来保存当前访问者的容器。我们知道，当web程序运行在web服务器中时，都是并发的
+环境，拿tomcat来说，对于每一个请求tomcat都会从自己维护的线程池中选一个线程去处理这个
+请求。` ThreadLocal `这个类提供了一种线程id到一个泛型的绑定，你可以认为它是一个Map，
+当我们从里面取数据的时候，实际上是将当前的线程id作为map的key，取出之前这个线程存的
+东西。这里我们将User保存在里面，这样我们就能随时在程序的任何地方拿出User信息了。
+### CookieUtils.java
+用来封装http请求中的Cookie的操作。
+### TicketUtils.java
+提供了一个生产Ticket的方法。
+
+这些类封装了一些基本的常用的方法，供我们调用。
+
+我们还封装了一个自己的Exception类：LoginRegisterException.java。
+
+HostHolder是一个重要的类，用来包装ConcurrentUtils.java的方法，并交给Spring容器去管理，
+使得我们可以在任何时候都能找当前的User，只要用户登录了，我们就将User信息设置到HostHolder
+里面，这样我们就在其他地方可以直接拿出User来用。
+
+## 重头戏LoginBiz
+其中注册的逻辑跟登录的逻辑其实是比较相似的，登出也是简单的将用户的T票从数据库删除。
+### 我们重点讲讲登录的逻辑
+在这之前，简单介绍一下两个依赖包：
+
+我们用了两个额外的依赖包，请见pom.xml文件，jodatime和common.lang3，jodatime提供了
+更加好用的时间操作，用来代替java.util.date。common.lang3是一个经典的项目，封装了
+一大批常用的工具类，我们主要使用StringUtils这个工具类，里面封装了大量常用的考虑了
+null情况的String操作，不会引发String引起的NullPointerException。
+
+``` java 
+    /**
+     * 登录逻辑，先检查邮箱和密码，然后更新t票。
+     * @return 返回最新t票
+     * @throws Exception 账号密码错误
+     */
+    public String login(String email, String password) throws Exception {
+        User user = userService.getUser(email);
+    
+        //登录信息检查
+        if (user == null)
+            throw new LoginRegisterException("邮箱不存在");
+        if(!StringUtils.equals(MD5.next(password),user.getPassword()))
+            throw new LoginRegisterException("密码不正确");
+    
+        //检查ticket
+        Ticket t = ticketService.getTicket(user.getId());
+        //如果没有t票。生成一个
+        if(t == null){
+            t = TicketUtils.next(user.getId());
+            ticketService.addTicket(t);
+            return t.getTicket();
+        }
+        //是否过期
+        if(t.getExpiredAt().before(new Date())){
+            //删除
+            ticketService.deleteTicket(t.getId());
+        }
+    
+        t = TicketUtils.next(user.getId());
+        ticketService.addTicket(t);
+    
+        ConcurrentUtils.setHost(user);
+        return t.getTicket();
+    }
+```
+
+登录方法两个参数用户email和password。密码检查的方法是将password散列，然后与数据库
+中村的加密密码对比。如果用户登录成功后，就会去数据库找用户的t票，进行一系列检查后，
+将t票更新为最新的t票，然后将用户信息加入ConcurrentUtils中，供HostHolder使用。最后
+返回t票的内容。这个类里我们持有了之前封装的` UserService ` 和 ` TicketService `，
+并直接用里面的方法很方便的操作数据库。
+
+你看，是不是很简单。
+
+看看我们还差什么？似乎只差一个controller了呢！
+
+### 自己完成！你还可以做的更好
+
+下一步：
+
+    git checkout step-5-project-login-controller
