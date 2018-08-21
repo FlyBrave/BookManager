@@ -181,8 +181,8 @@ Spring中重要的AOP组件，用来面向切面编程，多用在日志打印�
 ```
 spring.freemarker.suffix=.html
 ```
-这一句呢，大家不懂的可以查查资料，作用就是让我们能保持习惯，将templates文件夹下的
-模板文件已.html结尾。
+这一句呢，作用就是让我们能保持习惯，将templates文件夹下的模板文件以.html结尾。
+关于application.properties的设置还有很多，同样建议你去查看官方文档。
 
 ## 好了！你一定要自己敲代码！不然你的收获将非常有限！
 
