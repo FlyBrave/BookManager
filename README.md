@@ -60,6 +60,7 @@ Spring中重要的AOP组件，用来面向切面编程，多用在日志打印�
     git checkout step-2-project-book-curd
 在四个核心的包中（controllers、service、dao、model），我们分别创建了几个文件，这时
 其他的包里面可能还是空的，先不用管它们。
+**你应该注意到了sql这个文件夹，别犹豫，把自己的数据库建立起来吧！**
 ### 最底层的是model包中的Book.java，它非常的简单，用来描述书本的基本属性。
 
 ``` java
