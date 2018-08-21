@@ -113,8 +113,8 @@ Spring中重要的AOP组件，用来面向切面编程，多用在日志打印�
 ```
 是不是一目了然呢。
 ### service包中的BookService.java对BookDAO.java做一些封装，你可以认为是一种代理（Proxy）模式
-在BookService.java中，首先持有一个BookDAO的对象，这个对象由Spring自动帮你注入（@Autowired），
-你不用亲自去实例化，Spring已经很聪明的帮你实例化了。你需要的是将BookDAO的方法“包装”
+在` BookService.java `中，首先持有一个` BookDAO `的对象，这个对象由Spring自动帮你注入（@Autowired），
+你不用亲自去实例化，Spring已经很聪明的帮你实例化了。你需要的是将` BookDAO `的方法“包装”
 一下，供上层的类去调用。你一定很疑惑为什么要这么麻烦非得加一个什么包装（代理），
 这里解释一下：
 * 分层，将一些功能统一处理，比如
@@ -194,3 +194,63 @@ spring.freemarker.suffix=.html
 下一步：
     
     git checkout step-3-project-user-login
+    
+# 第三步：增加用户User和T票Ticket
+
+    git checkout step-3-project-user-login
+    
+经过上面的开发，相信你也掌握了Spring Boot以及SSM框架的基本用法。那么接下来我们要
+完善用户登录和权限认证工能。
+
+同样的，我们为用户和用户的凭证设计数据模型，根据模型创建相应的数据库表。并相应编写` User.java ` 和 ` Ticket.java `。
+例如在` Ticket.java `文件中：
+
+``` java
+    /**
+     * Created by nowcoder on 2018/08/04 下午3:41
+     */
+    public class Ticket {
+    
+        private int id;
+    
+        /**
+         * 相绑定的userId
+         */
+        private int userId;
+    
+        /**
+         * t票实体
+         */
+        private String ticket;
+    
+        /**
+         * 过期时间
+         */
+        private Date expiredAt;
+```
+留下好的注释是一个好习惯，记住是好的注释，意味着你要避免添加无用的甚至是错误的注释，
+那将比没有注释更加糟糕。留下创建人和时间也是不错的习惯，如果你在一个团队中，这样做
+能方便别人找到作者，当然，在对别人的代码有比较大的改动的时候也应该留下姓名和更新日志。
+有的时候你还需要给这个类做简要的说明，在对相对抽象的类上这种需要更加明显，你可以参考
+java的JDK源码或者Spring源码的注释习惯。
+
+你可能会问：Ticket的作用是什么？我更想问你：比如你已经登录了bilibili.com，当你点开
+一段舞蹈视频的时候，服务器凭什么知道是你点开了舞蹈视频并将这段视频添加到你的历史记
+录里面？在并发环境中可能还有其他人也点开了这个视频。
+
+如果你打开浏览器的Cookie列表你就会明白了（你不会要问怎么看浏览器的Cookie吧？），
+当你登录的时候，服务器就会生成一张凭证，这张凭证是你专属的，不会给别人。服务器将这张凭
+证写到服务器本地的数据库中，同时随着你的登录写进你的浏览器里面，只要你用这个浏览器去访问bilibili.com，
+这个Cookie就会随着你的请求发送到服务器，，服务器就会去找之前写进浏览器的Cookie并去数据库找拿着这张票的人，就是你啦，它就知道了
+是谁又在看舞蹈视屏呢~！
+
+好的，到这里就解释了` Ticket.java `类的作用和用法，你可以想象一下，接下来我们会怎么
+用这个类呢？
+
+这里我们没有动Controller，所以你之前写的Book CURD应该是不受影响的。
+
+### 请你自己完成User和Ticket的DAO层和Service层。
+
+下一步
+
+    git checkout step-4-project-login-biz
